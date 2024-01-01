@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import axios, { AxiosError } from "axios";
+import * as https from "https";
 
 export const TMWU_AUTH_PROVIDER = "TMW_UNIVERSE_AUTH_PROVIDER";
 
@@ -26,7 +27,12 @@ export class AuthModule {
     do {
       try {
         const response = await axios.get<{ publicKey: string }>(
-          `${options.authHost}/api/third-api/keys/public-key`
+          `${options.authHost}/api/third-api/keys/public-key`,
+          {
+            httpsAgent: new https.Agent({
+              rejectUnauthorized: false,
+            }),
+          }
         );
         publicKey = response?.data.publicKey;
         if (publicKey && typeof publicKey === "string") {
